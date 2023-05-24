@@ -21,6 +21,7 @@ export interface ForceSourcePullErrorResponse {
   message: string;
   name: string;
   result: PullResult[];
+  data?: PullResult[]; // TODO: make data required and remove result
   stack: string;
   status: number;
   warnings: any[];

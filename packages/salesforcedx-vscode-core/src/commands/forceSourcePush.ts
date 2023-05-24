@@ -184,7 +184,7 @@ export class ForceSourcePushExecutor extends SfdxCommandletExecutor<{}> {
       ? successes.result.deployedSource
       : undefined;
     if (deployedSource || parser.hasConflicts()) {
-      const rows = deployedSource || (errors && errors.result);
+      const rows = deployedSource || (errors && errors.data);
       const title = !parser.hasConflicts()
         ? nls.localize(`table_title_${titleType}ed_source`)
         : undefined;

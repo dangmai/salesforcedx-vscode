@@ -24,7 +24,10 @@ import {
 } from '@salesforce/salesforcedx-utils-vscode';
 import * as vscode from 'vscode';
 import { channelService } from '../../channels';
-import { FORCE_SOURCE_PULL_LOG_NAME } from '../../constants';
+import {
+  FORCE_SOURCE_PULL_LOG_NAME,
+  FORCE_SOURCE_PUSH_LOG_NAME
+} from '../../constants';
 import { nls } from '../../messages';
 import { notificationService, ProgressNotification } from '../../notifications';
 import { sfdxCoreSettings } from '../../settings';
@@ -67,7 +70,12 @@ export abstract class SfdxCommandletExecutor<T>
     const commandLogName = execution.command.logName;
     // If Pull operation, output text will be
     // generated later by ForcePullResultParser
-    if (commandLogName !== FORCE_SOURCE_PULL_LOG_NAME) {
+    if (
+      !(
+        commandLogName === FORCE_SOURCE_PULL_LOG_NAME ||
+        commandLogName === FORCE_SOURCE_PUSH_LOG_NAME
+      )
+    ) {
       channelService.streamCommandOutput(execution);
     }
 
@@ -125,12 +133,11 @@ export abstract class SfdxCommandletExecutor<T>
     startTime: [number, number],
     output: string
   ): void {
-    if (
-      exitCode === 0 &&
-      execution.command.logName === FORCE_SOURCE_PULL_LOG_NAME
-    ) {
+    if (execution.command.logName === FORCE_SOURCE_PULL_LOG_NAME) {
       const pullResult = this.parseOutput(output);
-      this.updateCache(pullResult);
+      if (exitCode === 0) {
+        this.updateCache(pullResult);
+      }
 
       const pullParser = new ForcePullResultParser(output);
       const errors = pullParser.getErrors();
@@ -212,9 +219,9 @@ export abstract class SfdxCommandletExecutor<T>
     }
 
     if (errors) {
-      const { name, message, result } = errors;
-      if (result) {
-        const outputTable = this.getErrorTable(table, result, titleType);
+      const { name, message, data } = errors;
+      if (data) {
+        const outputTable = this.getErrorTable(table, data, titleType);
         channelService.appendLine(outputTable);
       } else if (name && message) {
         channelService.appendLine(`${name}: ${message}\n`);

@@ -26,7 +26,8 @@ describe('force:source:deploy parser', () => {
       stack: '123',
       status: 1,
       warnings: [],
-      result: []
+      result: [],
+      data: []
     };
     deploySuccessResult = {
       status: 0,

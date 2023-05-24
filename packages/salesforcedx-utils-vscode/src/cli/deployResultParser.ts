@@ -23,6 +23,7 @@ export interface ForceSourceDeployErrorResponse {
   message: string;
   name: string;
   result: DeployResult[];
+  data?: DeployResult[]; // TODO: make data required and remove result
   stack: string;
   status: number;
   warnings: any[];
